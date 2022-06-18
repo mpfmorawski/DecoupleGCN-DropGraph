@@ -1,2 +1,6 @@
 data/nturgbd_raw/*.skeleton
+data/nturgbd_raw/skeletons/*.skeleton
+data/ntu/xsub/
+data/ntu/xview/
 data_gen/__pycache__/
+
