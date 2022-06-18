@@ -148,7 +148,7 @@ def gendata(data_path, out_path, ignored_sample_path=None, benchmark='xview', pa
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='NTU-RGB-D Data Converter.')
-    parser.add_argument('--data_path', default='data/nturgbd_raw')
+    parser.add_argument('--data_path', default='data/nturgbd_raw/skeletons')
     parser.add_argument('--ignored_sample_path',
                         default='data/nturgbd_raw/NTU_RGBD_samples_with_missing_skeletons.txt')
     parser.add_argument('--out_folder', default='data/ntu/')
