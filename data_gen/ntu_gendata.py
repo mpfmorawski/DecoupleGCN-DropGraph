@@ -6,13 +6,24 @@ import sys
 sys.path.extend(['../'])
 from preprocess import pre_normalization
 
+#! Subjects which are used for training in xsub evaluation
 training_subjects = [
     1, 2, 4, 5, 8, 9, 13, 14, 15, 16, 17, 18, 19, 25, 27, 28, 31, 34, 35, 38
 ]
+
+#! Cameras which are used for training in xview evaluation
 training_cameras = [2, 3]
+
+#?
 max_body_true = 2
+
+#?
 max_body_kinect = 4
+
+#! Number of joints in skeletons in NTU RGBD dataset 
 num_joint = 25
+
+#! Max number of frames in video
 max_frame = 300
 
 import numpy as np
@@ -70,7 +81,7 @@ def get_nonzero_std(s):  # tvc
     return s
 
 
-def read_xyz(file, max_body=4, num_joint=25):  # 取了前两个body
+def read_xyz(file, max_body=4, num_joint=25):  # Took first two bodies
     seq_info = read_skeleton_filter(file)
     data = np.zeros((max_body, seq_info['numFrame'], num_joint, 3))
     for n, f in enumerate(seq_info['frameInfo']):
