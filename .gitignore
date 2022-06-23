@@ -1,6 +1,6 @@
+.vscode/
 data/nturgbd_raw/*.skeleton
 data/nturgbd_raw/skeletons/*.skeleton
-data/ntu/xsub/
-data/ntu/xview/
+data/ntu/
 data_gen/__pycache__/
-
+test_scripts/data/

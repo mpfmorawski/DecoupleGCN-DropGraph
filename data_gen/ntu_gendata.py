@@ -14,7 +14,7 @@ training_subjects = [
 #! Cameras which are used for training in xview evaluation
 training_cameras = [2, 3]
 
-#?
+#! Max number of bodies in features
 max_body_true = 2
 
 #?
@@ -153,6 +153,9 @@ def gendata(data_path, out_path, ignored_sample_path=None, benchmark='xview', pa
         data = read_xyz(os.path.join(data_path, s), max_body=max_body_kinect, num_joint=num_joint)
         fp[i, :, 0:data.shape[1], :, :] = data
 
+    # Saving array to test pre_normalization function in test_scripts
+    # np.save('test_scripts/data/ntu/{}/{}_data_joint_before_pre_normalization.npy'.format(benchmark,part), fp)
+    
     fp = pre_normalization(fp)
     np.save('{}/{}_data_joint.npy'.format(out_path, part), fp)
 
