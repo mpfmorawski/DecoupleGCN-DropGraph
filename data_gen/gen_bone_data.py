@@ -36,7 +36,7 @@ sets = {
 
 # OR datasets = {'ntu/xview', 'ntu/xsub', 'ntu120/xsetup', 'ntu120/xsub'}
 datasets = {
-    'ntu/xview', 'ntu/xsub'
+    'ntu/xsub', 'ntu/xview'
 }
 
 
