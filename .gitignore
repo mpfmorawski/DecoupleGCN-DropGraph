@@ -3,4 +3,7 @@ data/nturgbd_raw/*.skeleton
 data/nturgbd_raw/skeletons/*.skeleton
 data/ntu/
 data_gen/__pycache__/
+feeders/__pycache__/
+graph/__pycache__/
+model/__pycache__/
 test_scripts/data/
