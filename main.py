@@ -3,6 +3,7 @@ from __future__ import print_function
 
 import argparse
 import inspect
+import json
 import os
 import pickle
 import random
@@ -352,6 +353,7 @@ class Processor():
         loader = self.data_loader['train']
         self.adjust_learning_rate(epoch)
         loss_value = []
+        acc = []
         self.record_time()
         timer = dict(dataloader=0.001, model=0.001, statistics=0.001)
         process = tqdm(loader)
@@ -369,11 +371,13 @@ class Processor():
                     print(key + '-not require grad')
         for batch_idx, (data, label, index) in enumerate(process):
             self.global_step += 1
-            # get data
+
+            # get data to proper device
             data = Variable(data.float().cuda(
                 self.output_device), requires_grad=False)
             label = Variable(label.long().cuda(
                 self.output_device), requires_grad=False)
+
             timer['dataloader'] += self.split_time()
 
             # forward
@@ -393,25 +397,38 @@ class Processor():
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
-            loss_value.append(loss.data)
+            loss_value.append(loss.item())
             timer['model'] += self.split_time()
 
             value, predict_label = torch.max(output.data, 1)
-            acc = torch.mean((predict_label == label.data).float())
+            acc.append(torch.mean((predict_label == label.data).float()).item())
 
             self.lr = self.optimizer.param_groups[0]['lr']
 
             if self.global_step % self.arg.log_interval == 0:
                 self.print_log(
                     f'\tBatch({batch_idx}/{len(loader)}) done. Loss: {loss.data:.4f}  lr:{self.lr:.6f}')
-            timer['statistics'] += self.split_time()
 
-        # statistics of time consumption and loss
+            # ONLY FOR FASTER TESTING. REMEMBER TO DELETE IT!!!
+            if batch_idx == 10:
+                break
+
+        #statistics of loss and accuracy
+        self.print_log(f'\tMean train loss of {len(loader)} batches: {np.mean(np.asarray(loss_value)):.4f}')
+        self.print_log(f'\tTop1 train accuracy: {np.mean(np.asarray(acc))*100:.2f}%')
+
+        timer['statistics'] += self.split_time()
+        
+        # statistics of time consumption
         proportion = {
             k: f'{int(round(v * 100 / sum(timer.values()))):02d}%'
             for k, v in timer.items()
         }
 
+        self.print_log(f'\tStatistics of time consumption: {json.dumps(proportion)}')
+
+
+        # saving model
         state_dict = self.model.state_dict()
         weights = OrderedDict([[k.split('module.')[-1],
                                 v.cpu()] for k, v in state_dict.items()])
@@ -453,6 +470,7 @@ class Processor():
                 else:
                     l1 = 0
                 loss = self.loss(output, label)
+                
                 score_frag.append(output.data.cpu().numpy())
                 loss_value.append(loss.data.cpu().numpy())
 
@@ -468,6 +486,7 @@ class Processor():
                         if x != true[i] and wrong_file is not None:
                             f_w.write(str(index[i]) + ',' +
                                       str(x) + ',' + str(true[i]) + '\n')
+                
             score = np.concatenate(score_frag)
 
             if 'UCLA' in arg.Experiment_name:
@@ -480,8 +499,7 @@ class Processor():
                 score_dict = dict(
                     zip(self.data_loader[ln].dataset.sample_name, score))
 
-                with open('./work_dir/' + arg.Experiment_name + '/eval_results/best_acc' + '.pkl'.format(
-                        epoch, accuracy), 'wb') as f:
+                with open('./work_dir/' + arg.Experiment_name + '/eval_results/best_acc' + '.pkl', 'wb') as f:
                     pickle.dump(score_dict, f)
 
             print('Eval Accuracy: ', accuracy,
