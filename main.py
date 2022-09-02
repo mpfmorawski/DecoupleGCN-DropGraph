@@ -174,6 +174,13 @@ def get_parser():
     parser.add_argument("--only_train_epoch", default=0)
     parser.add_argument("--warm_up_epoch", default=0)
 
+    # postprocessing
+    parser.add_argument(
+        "--statistics_file_name",
+        default="statistics.csv",
+        help="name of file storing training and testing statistics",
+    )
+
     return parser
 
 
@@ -206,6 +213,18 @@ class Processor:
         self.load_data()
         self.lr = self.arg.base_lr
         self.best_acc = 0
+        self.statistics = self.create_statistics_structure()
+
+    def create_statistics_structure(self):
+        statistics = pd.DataFrame(
+            {
+            'train_loss': pd.Series(dtype='float'),
+            'train_accuracy': pd.Series(dtype='float'),
+            'eval_loss': pd.Series(dtype="float"),
+            'eval_accuracy': pd.Series(dtype="float"),
+        })
+        statistics.index.name = 'epoch'
+        return statistics
 
     def load_data(self):
         Feeder = import_class(self.arg.feeder)
@@ -427,15 +446,14 @@ class Processor:
                     f"\tBatch({batch_idx}/{len(loader)}) done. Loss: {loss.data:.4f}  lr:{self.lr:.6f}"
                 )
 
-            # ONLY FOR FASTER TESTING. REMEMBER TO DELETE IT!!!
-            if batch_idx == 10:
-                break
-
         # statistics of loss and accuracy
+        self.statistics.at[epoch, 'train_loss'] = np.mean(np.asarray(loss_value))
+        self.statistics.at[epoch, 'train_accuracy'] = np.mean(np.asarray(acc))*100
+
         self.print_log(
-            f"\tMean train loss of {len(loader)} batches: {np.mean(np.asarray(loss_value)):.4f}"
+            f"\tMean train loss of {len(loader)} batches: {self.statistics.at[epoch, 'train_loss']:.4f}"
         )
-        self.print_log(f"\tTop1 train accuracy: {np.mean(np.asarray(acc))*100:.2f}%")
+        self.print_log(f"\tTop1 train accuracy: {self.statistics.at[epoch, 'train_accuracy']:.2f}%")
 
         timer["statistics"] += self.split_time()
 
@@ -537,9 +555,13 @@ class Processor:
 
             print("Eval Accuracy: ", accuracy, " model: ", self.arg.model_saved_name)
 
+            # statistics of loss and accuracy
+            self.statistics.at[epoch, 'eval_loss'] = np.mean(loss_value)
+            self.statistics.at[epoch, 'eval_accuracy'] = accuracy
+
             score_dict = dict(zip(self.data_loader[ln].dataset.sample_name, score))
             self.print_log(
-                f"\tMean {ln} loss of {len(self.data_loader[ln])} batches: {np.mean(loss_value)}."
+                f"\tMean {ln} loss of {len(self.data_loader[ln])} batches: {self.statistics.at[epoch, 'eval_loss']}."
             )
             for k in self.arg.show_topk:
                 self.print_log(
@@ -574,6 +596,9 @@ class Processor:
                 self.train(epoch, save_model=save_model)
 
                 self.eval(epoch, save_score=self.arg.save_score, loader_name=["test"])
+
+                self.statistics.to_csv(f"./work_dir/{self.arg.Experiment_name}/{self.arg.statistics_file_name}"
+                )
 
             print(
                 "best accuracy: ",
