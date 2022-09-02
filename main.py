@@ -218,12 +218,13 @@ class Processor:
     def create_statistics_structure(self):
         statistics = pd.DataFrame(
             {
-            'train_loss': pd.Series(dtype='float'),
-            'train_accuracy': pd.Series(dtype='float'),
-            'eval_loss': pd.Series(dtype="float"),
-            'eval_accuracy': pd.Series(dtype="float"),
-        })
-        statistics.index.name = 'epoch'
+                "train_loss": pd.Series(dtype="float"),
+                "train_accuracy": pd.Series(dtype="float"),
+                "eval_loss": pd.Series(dtype="float"),
+                "eval_accuracy": pd.Series(dtype="float"),
+            }
+        )
+        statistics.index.name = "epoch"
         return statistics
 
     def load_data(self):
@@ -447,13 +448,15 @@ class Processor:
                 )
 
         # statistics of loss and accuracy
-        self.statistics.at[epoch, 'train_loss'] = np.mean(np.asarray(loss_value))
-        self.statistics.at[epoch, 'train_accuracy'] = np.mean(np.asarray(acc))*100
+        self.statistics.at[epoch, "train_loss"] = np.mean(np.asarray(loss_value))
+        self.statistics.at[epoch, "train_accuracy"] = np.mean(np.asarray(acc))
 
         self.print_log(
             f"\tMean train loss of {len(loader)} batches: {self.statistics.at[epoch, 'train_loss']:.4f}"
         )
-        self.print_log(f"\tTop1 train accuracy: {self.statistics.at[epoch, 'train_accuracy']:.2f}%")
+        self.print_log(
+            f"\tTop1 train accuracy: {self.statistics.at[epoch, 'train_accuracy']*100:.2f}%"
+        )
 
         timer["statistics"] += self.split_time()
 
@@ -556,8 +559,8 @@ class Processor:
             print("Eval Accuracy: ", accuracy, " model: ", self.arg.model_saved_name)
 
             # statistics of loss and accuracy
-            self.statistics.at[epoch, 'eval_loss'] = np.mean(loss_value)
-            self.statistics.at[epoch, 'eval_accuracy'] = accuracy
+            self.statistics.at[epoch, "eval_loss"] = np.mean(loss_value)
+            self.statistics.at[epoch, "eval_accuracy"] = accuracy
 
             score_dict = dict(zip(self.data_loader[ln].dataset.sample_name, score))
             self.print_log(
@@ -597,7 +600,8 @@ class Processor:
 
                 self.eval(epoch, save_score=self.arg.save_score, loader_name=["test"])
 
-                self.statistics.to_csv(f"./work_dir/{self.arg.Experiment_name}/{self.arg.statistics_file_name}"
+                self.statistics.to_csv(
+                    f"./work_dir/{self.arg.Experiment_name}/{self.arg.statistics_file_name}"
                 )
 
             print(
