@@ -11,7 +11,7 @@ def get_parser():
     )
     argument_parser.add_argument(
         "--filename",
-        default="./postprocessing/statistics.csv",
+        default="./postprocessing/statistics_example.csv",
     )
     return argument_parser
 
@@ -22,8 +22,8 @@ if __name__ == "__main__":
     data = pd.read_csv(arg.filename)
 
     loss_curves = data.plot(x = 'epoch', y=['train_loss', 'eval_loss'], kind="line")
-    loss_curves.figure.savefig("./postprocessing/loss_curve.png")
+    loss_curves.figure.savefig("./postprocessing/plots/loss_curve.png")
 
     accuracy_curves = data.plot(x = 'epoch', y=['train_accuracy', 'eval_accuracy'], kind="line")
-    accuracy_curves.figure.savefig("./postprocessing/accuracy_curve.png")
+    accuracy_curves.figure.savefig("./postprocessing/plots/accuracy_curve.png")
 
