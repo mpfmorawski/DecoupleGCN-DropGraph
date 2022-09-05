@@ -1,6 +1,5 @@
 import argparse
 
-import matplotlib.pyplot as plt
 import pandas as pd
 
 
