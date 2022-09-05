@@ -40,7 +40,7 @@ def get_parser():
     )
     parser.add_argument(
         "--work-dir",
-        default="./work_dir/temp",
+        default="./work_dir",
         help="the work folder for storing results",
     )
 
@@ -191,8 +191,8 @@ class Processor:
 
     def __init__(self, arg):
 
-        arg.model_saved_name = "./save_models/" + arg.Experiment_name
-        arg.work_dir = "./work_dir/" + arg.Experiment_name
+        arg.model_saved_name = f"./save_models/{arg.Experiment_name}"
+        arg.work_dir = f"{arg.work_dir}/{arg.Experiment_name}"
         self.arg = arg
         self.save_arg()
         if arg.phase == "train":
