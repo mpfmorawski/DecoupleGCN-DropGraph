@@ -4,7 +4,6 @@ import pandas as pd
 
 
 def get_parser():
-    # parameter priority: command line > config > default
     argument_parser = argparse.ArgumentParser(
         description="Plots of loss and accuracy curves"
     )
