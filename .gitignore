@@ -2,6 +2,7 @@
 data/nturgbd_raw/*.skeleton
 data/nturgbd_raw/skeletons/*.skeleton
 data/ntu/
+data/ntu_interactions/
 data_gen/__pycache__/
 feeders/__pycache__/
 graph/__pycache__/
