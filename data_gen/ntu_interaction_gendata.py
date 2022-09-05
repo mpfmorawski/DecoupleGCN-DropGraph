@@ -178,7 +178,7 @@ def gendata(
 
         if issample:
             sample_name.append(filename)
-            sample_label.append(action_class - 1)
+            sample_label.append(map_interaction_class(action_class))
 
     with open("{}/{}_label.pkl".format(out_path, part), "wb") as f:
         pickle.dump((sample_name, list(sample_label)), f)
@@ -198,6 +198,9 @@ def gendata(
 
     fp = pre_normalization(fp)
     np.save("{}/{}_data_joint.npy".format(out_path, part), fp)
+
+def map_interaction_class(action_class):
+    return action_class - INTERACTIONS_CLASSES[0]
 
 
 if __name__ == "__main__":
